@@ -1,84 +1,79 @@
 # EC2_Kiosko_<ZamoraBarrios>
-"""
-Kiosko Universitario UCB
-"""
 import csv
 import os
 import pickle
-import sys
 from typing import List, Dict, Tuple
 
-CSV_FILE = "datos.csv"
-BIN_FILE = "datos.bin"
-ALERTS_FILE = "alertas.csv"
+CSV_FILE="datos.csv"
+BIN_FILE="datos.bin"
+ALERTS_FILE="alertas.csv"
 
 
-def init_demo_products() -> Tuple[List[Dict], List[List[float]]]:
-    demo = [
-        {"codigo": "A-001", "nombre": "Regla", "precio": 6.5, "stock": 20, "stock_minimo": 5, "vendidos_hoy": 0},
-        {"codigo": "B-100", "nombre": "Lapiz", "precio": 8.0, "stock": 25, "stock_minimo": 6, "vendidos_hoy": 0},
-        {"codigo": "C-200", "nombre": "Borrador", "precio": 3.0, "stock": 30, "stock_minimo": 3, "vendidos_hoy": 0},
-        {"codigo": "D-300", "nombre": "Cuaderno_anillado", "precio": 20.0, "stock": 15, "stock_minimo": 2, "vendidos_hoy": 0},
-        {"codigo": "F-400", "nombre": "Tijera", "precio": 18.0, "stock": 8, "stock_minimo": 2, "vendidos_hoy": 0},
-        {"codigo": "G-500", "nombre": "Marcador", "precio": 9.0, "stock": 22, "stock_minimo": 5, "vendidos_hoy": 0},
-        {"codigo": "H-600", "nombre": "Resaltador", "precio": 5.0, "stock": 40, "stock_minimo": 6, "vendidos_hoy": 0},
-        {"codigo": "I-700", "nombre": "Calculadora", "precio": 80.0, "stock": 6, "stock_minimo": 2, "vendidos_hoy": 0},
-        {"codigo": "J-800", "nombre": "Archivador", "precio": 10.0, "stock": 13, "stock_minimo": 3, "vendidos_hoy": 0},
+def init_demo_productos()->Tuple[List[Dict],List[List[float]]]:
+    demo=[
+        {"codigo":"A-001","nombre":"Regla","precio":6.5,"stock":20,"stock_mínimo":5,"vendidos_hoy":0},
+        {"codigo":"B-100","nombre":"Lápiz","precio":8.0,"stock":25,"stock_mínimo":6,"vendidos_hoy":0},
+        {"codigo":"C-200","nombre":"Borrador","precio":3.0,"stock":30,"stock_mínimo":3,"vendidos_hoy":0},
+        {"codigo":"D-300","nombre":"Cuaderno_anillado","precio":20,"stock":15,"stock_mínimo":2,"vendidos_hoy":0},
+        {"codigo":"F-400","nombre":"Tijera","precio":18.0,"stock":8,"stock_mínimo":2,"vendidos_hoy":0},
+        {"codigo":"G-500","nombre":"Marcador","precio":9.0,"stock":22,"stock_mínimo":5,"vendidos_hoy":0},
+        {"codigo":"H-600","nombre":"Resaltador","precio":5.0,"stock":40,"stock_mínimo":6,"vendidos_hoy":0},
+        {"codigo":"I-700","nombre":"Calculadora","precio":80.0,"stock":6,"stock_mínimo":2,"vendidos_hoy":0},
+        {"codigo":"J-800","nombre":"Archivador","precio":10.0,"stock":13,"stock_mínimo":3,"vendidos_hoy":0}
     ]
-    ventas_semana = [[0.0 for _ in range(3)] for _ in range(7)]
+    ventas_semana=[[0.0 for i in range(3)] for i in range(7)]
     return demo, ventas_semana
 
 
-
-def cargar_csv(path: str) -> Tuple[List[Dict], List[List[float]]]:
-    productos = []
+def cargar_csv(path:str)->Tuple[List[Dict],List[List[float]]]:
+    productos=[]
     try:
-        with open(path, newline="", encoding="utf-8") as f:
-            r = csv.DictReader(f)
+        with open(path,newline="",encoding="utf-8") as f:
+            r=csv.DictReader(f)
             for fila in r:
                 try:
-                    prod = {
-                        "codigo": fila["codigo"].strip(),
-                        "nombre": fila["nombre"].strip(),
-                        "precio": float(fila.get("precio", 0)),
-                        "stock": int(float(fila.get("stock", 0))),
-                        "stock_minimo": int(float(fila.get("stock_minimo", 0))),
-                        "vendidos_hoy": int(float(fila.get("vendidos_hoy", 0))) if fila.get("vendidos_hoy") not in (None, "") else 0,
+                    prod={
+                        "codigo":fila["codigo"].strip(),
+                        "nombre":fila["nombre"].strip(),
+                        "precio":float(fila.get("precio",0)),
+                        "stock":int(float(fila.get("stock",0))),
+                        "stock_mínimo":int(float(fila.get("stock_mínimo",0))),
+                        "vendidos_hoy":int(float(fila.get("vendidos_hoy",0))) if fila.get("vendidos_hoy") not in (None,"") else 0,
                     }
                     productos.append(prod)
                 except Exception:
                     continue
-        ventas_semana = [[0.0 for _ in range(3)] for _ in range(7)]
-        return productos, ventas_semana
+        ventas_semana = [[0.0 for i in range(3)] for i in range(7)]
+        return productos,ventas_semana
     except FileNotFoundError:
         raise
     except Exception as e:
-        print(f"Error leyendo CSV: {e}")
+        print(f"Error leyendo csv:{e}")
         raise
 
 
-def guardar_csv(path: str, productos: List[Dict]) -> None:
-    with open(path, "w", newline="", encoding="utf-8") as f:
-        fieldnames = ["codigo", "nombre", "precio", "stock", "stock_minimo", "vendidos_hoy"]
-        w = csv.DictWriter(f, fieldnames=fieldnames)
+def guardar_csv(path:str,productos:List[Dict])->None:
+    with open(path,"w",newline="",encoding="utf-8") as f:
+        fieldnames=["codigo","nombre","precio","stock","stock_mínimo","vendidos_hoy"]
+        w=csv.DictWriter(f,fieldnames=fieldnames)
         w.writeheader()
         for p in productos:
             w.writerow({
-                "codigo": p["codigo"],
-                "nombre": p["nombre"],
-                "precio": f"{p['precio']:.2f}",
-                "stock": p["stock"],
-                "stock_minimo": p["stock_minimo"],
-                "vendidos_hoy": p.get("vendidos_hoy", 0),
+                "codigo":p["codigo"],
+                "nombre":p["nombre"],
+                "precio":f"{p["precio"]:.2f}",
+                "stock":p["stock"],
+                "stock_mínimo":p["stock_mínimo"],
+                "vendidos_hoy":p.get("vendidos_hoy",0),
             })
 
 
-def guardar_bin(path: str, productos: List[Dict], ventas_semana: List[List[float]]) -> None:
+def guardar_bin(path:str,productos:List[Dict],ventas_semana:List[List[float]])->None:
     try:
-        with open(path, "wb") as f:
-            pickle.dump({"productos": productos, "ventas_semana": ventas_semana}, f)
+        with open(path,"wb") as f:
+            pickle.dump({"productos":productos,"ventas_semana":ventas_semana},f)
     except Exception as e:
-        print(f"Error guardando binario: {e}")
+        print(f"Error guardando binario:{e}")
 
 
 def cargar_bin(path: str) -> Tuple[List[Dict], List[List[float]]]:
@@ -92,9 +87,9 @@ def cargar_bin(path: str) -> Tuple[List[Dict], List[List[float]]]:
         raise
 
 
-def exportar_alertas_csv(path: str, productos: List[Dict]) -> None:
-    bajo = [p for p in productos if p["stock"] <= p["stock_minimo"]]
-    with open(path, "w", newline="", encoding="utf-8") as f:
+def exportar_csv(path:str, productos:List[Dict])->None:
+    bajo=[p for p in productos if p ["stock"]<=p["stock_mínimo"]]
+    with open(path,"w",newline="",encoding="utf-8") as f:
         fieldnames = ["codigo", "nombre", "stock", "stock_minimo"]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -107,49 +102,43 @@ def exportar_alertas_csv(path: str, productos: List[Dict]) -> None:
             })
 
 
-# Utilidades,búsquedas
-
-
-def encontrar_index_codigo(productos: List[Dict], code: str) -> int:
-    for i, p in enumerate(productos):
-        if p["codigo"] == code:
+def encontrar_index_codigo(productos:List[Dict],code: str)->int:
+    for i,p in enumerate(productos):
+        if p["codigo"]==code:
             return i
     return -1
 
 
-def buscar_lineal_por_nombre(productos: List[Dict], nombre: str) -> List[Dict]:
-    nombre_lower = nombre.lower()
-    return [p for p in productos if nombre_lower in p["nombre"].lower()]
+def buscar_lineal_por_nombre(productos:List[Dict],nombre: str)->List[Dict]:
+    nombre=nombre.lower()
+    return [p for p in productos if nombre in p["nombre"].lower()]
 
 
-def buscar_binario_por_codigo(productos: List[Dict], codigo: str) -> int:
-    low, high = 0, len(productos) - 1
-    while low <= high:
-        mid = (low + high) // 2
-        if productos[mid]["codigo"] == codigo:
+def buscar_binario_por_codigo(productos:List[Dict],codigo:str)->int:
+    low,high=0,len(productos)-1
+    while low<=high:
+        mid=(low+high)//2
+        if productos[mid]["codigo"]==codigo:
             return mid
-        elif productos[mid]["codigo"] < codigo:
-            low = mid + 1
+        elif productos[mid]["codigo"]<codigo:
+            low=mid + 1
         else:
-            high = mid - 1
+            high=mid-1
     return -1
 
 
 def ordenar_burbuja(productos: List[Dict], key: str, reverse: bool = False) -> None:
-    n = len(productos)
-    for i in range(n - 1):
-        intercambio = False
-        for j in range(n - 1 - i):
-            a = productos[j][key]
-            b = productos[j + 1][key]
-            if (not reverse and a > b) or (reverse and a < b):
-                productos[j], productos[j + 1] = productos[j + 1], productos[j]
-                intercambio = True
+    n=len(productos)
+    for i in range (n-1):
+        intercambio=False
+        for j in range(n- 1- i):
+            a=productos[j][key]
+            b=productos[j+1][key]
+            if(not reverse and a > b) or (reverse and a< b):
+                productos[j],productos[j+1]=productos[j+1],productos[j]
+                intercambio=True
         if not intercambio:
             break
-
-
-#Operaciones inventario
 
 
 def anadir_producto(productos: List[Dict]) -> None:
@@ -170,17 +159,17 @@ def anadir_producto(productos: List[Dict]) -> None:
     print("Producto agregado con exito.")
 
 
-def eliminar_producto(productos: List[Dict]) -> None:
-    codigo = input("Codigo a eliminar: ").strip()
-    idx = encontrar_index_codigo(productos, codigo)
-    if idx == -1:
-        print("Producto no encontrado")
+def eliminar_producto(productos:List[Dict])->None:
+    codigo=input("Código a eliminar: ")
+    idx=encontrar_index_codigo(productos,codigo)
+    if idx ==-1:
+        print("producto no encontrado")
         return
     productos.pop(idx)
-    print("Producto eliminado")
+    print("producto eliminado")
 
 
-def modificar_producto(productos: List[Dict]) -> None:
+def modificar_producto(productos:List[Dict])->None:
     codigo = input("Codigo a modificar: ").strip()
     idx = encontrar_index_codigo(productos, codigo)
     if idx == -1:
@@ -203,71 +192,68 @@ def modificar_producto(productos: List[Dict]) -> None:
     print("Producto modificado.")
 
 
-def restock_producto(productos: List[Dict]) -> None:
-    codigo = input("Codigo a reabastecer: ").strip()
-    idx = encontrar_index_codigo(productos, codigo)
-    if idx == -1:
-        print("Producto no encontrado")
+def restock_producto(productos:List[Dict])->None:
+    codigo=input("Codigo a reestablecer: ").strip()
+    idx=encontrar_index_codigo(productos,codigo)
+    if idx==-1:
+        print("producto no encontrado")
         return
     try:
-        amount = int(input("Cantidad a sumar: ").strip())
+        monto=int(input("Cantidad a sumar: ").strip())
     except ValueError:
-        print("Cantidad invalida.")
+        print("Cantidad inválida")
         return
-    if amount < 0:
-        print("No puede agregar cantidad negativa.")
+    if monto<0:
+        print("Error, cantidad negativa")
         return
-    productos[idx]["stock"] += amount
-    print("Stock actualizado.")
+    productos[idx]["stock"]+=monto
+    print("Stock actualizado")
 
 
-def vender_producto(productos: List[Dict], ventas_semana: List[List[float]]) -> None:
-    codigo = input("Codigo a vender: ").strip()
-    idx = encontrar_index_codigo(productos, codigo)
-    if idx == -1:
-        print("Producto no encontrado")
+def vender_producto(productos:List[Dict], ventas_semana:List[List[float]])->None:
+    codigo=input("Codigo a vender: ").strip()
+    idx=encontrar_index_codigo(productos,codigo)
+    if idx==-1:
+        print("producto no encontrado")
         return
-    p = productos[idx]
+    p=productos[idx]
     try:
-        qt = int(input("Cantidad a vender: ").strip())
+        qt=int(input("Cantidad a vender: "))
     except ValueError:
-        print("Cantidad invalida")
+        print("Cantidad inválida")
         return
-    if qt <= 0:
+    if qt<=0:
         print("La cantidad debe ser positiva")
         return
-    if qt > p["stock"]:
-        print(f"Stock insuficiente. Disponible: {p['stock']}")
+    if qt>p["stock"]:
+        print(f"stock insuficiente. Disponible: {p["stock"]}")
         return
     try:
-        dia = int(input("Dia (0=Dom,1=Lun,...,6=Sab): ").strip())
+        dia=int(input("Dia(0=Dom,1=Lun,...,6=Sab): ").strip())
         if dia < 0 or dia > 6:
             raise ValueError
     except ValueError:
-        print("Dia invalido")
+        print("Día inválido")
         return
     try:
-        horario = int(input("Horario (0=Manana,1=Tarde,2=Noche): ").strip())
-        if horario < 0 or horario > 2:
+        horario=int(input("Horario( 0=Mañana, 1=Tarde, 2=Noche): ").strip())
+        if horario <0 or horario >2:
             raise ValueError
     except ValueError:
-        print("Horario invalido")
+        print("Horario inválido")
         return
-    total = qt * p["precio"]
-    p["stock"] -= qt
-    p["vendidos_hoy"] = p.get("vendidos_hoy", 0) + qt
-    ventas_semana[dia][horario] += total
+    total=qt*p["precio"]
+    p["stock"]-=qt
+    p["vendidos_hoy"]=p.get("vendidos_hoy",0)+qt
+    ventas_semana[dia][horario]+=total
     print(f"Venta registrada. Monto: {total:.2f}")
-
-
-# Reportes
 
 
 def reporte_top_3(productos: List[Dict]) -> None:
     por_ventas = sorted(productos, key=lambda x: x.get("vendidos_hoy", 0), reverse=True)
     print("Top 3 mas vendidos del dia:")
     for i, p in enumerate(por_ventas[:3], start=1):
-        print(f"{i}. {p['nombre']} ({p['codigo']}) - Vendidos hoy: {p.get('vendidos_hoy', 0)}")
+        print(f"{i}. {p['nombre']} ({p['codigo']}) - Vendidos hoy: {p.get('vendidos_hoy',0)}")
 
 
 def reportar_low_stock(productos: List[Dict]) -> None:
@@ -280,54 +266,51 @@ def reportar_low_stock(productos: List[Dict]) -> None:
         print(f"{p['codigo']} - {p['nombre']} | Stock: {p['stock']} | Minimo: {p['stock_minimo']}")
 
 
-def reporte_semanal(ventas_semana: List[List[float]]) -> None:
-    dias = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
-    print("Resumen semanal (totales por dia y horario):")
-    for i, dia in enumerate(ventas_semana):
-        total_dia = sum(dia)
+def reporte_semanal(ventas_semana: List[List[float]])->None:
+    dias=["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
+    horarios=["Manana", "Tarde", "Noche"]
+    print("Resumen semanal(totales por dia y horario): ")
+    for i,dia in enumerate(ventas_semana):
+        total_dia=sum(dia)
         print(f"{dias[i]}: Manana={dia[0]:.2f} Tarde={dia[1]:.2f} Noche={dia[2]:.2f} | Total dia={total_dia:.2f}")
-    total_sem = sum(sum(row) for row in ventas_semana)
-    print(f"Total semanal: {total_sem:.2f}")
+    total_sem=sum(sum(row) for row in ventas_semana)
+    print(f"Total semanal:{ total_sem:.2f}")
 
 
-# Mostrar menús
-
-
-def mostrar_productos(productos: List[Dict]) -> None:
+def mostrar_productos(productos:List[Dict])->None:
     if not productos:
         print("No hay productos registrados")
         return
-    print("Codigo | Nombre           | Precio  | Stock | Minimo | VendidosHoy")
-    print("-" * 70)
+    print("Codigo| Nombre | Precio | Stock | Mínimo | Vendidos_hoy")
+    print("-"*60)
     for p in productos:
-        print(f"{p['codigo']:7} | {p['nombre'][:15]:15} | {p['precio']:7.2f} | {p['stock']:5} | {p['stock_minimo']:6} | {p.get('vendidos_hoy', 0):10}")
+        print(f"{p['codigo']:7} | {p['nombre'][:15]:15} | {p['precio']:6.2f} | {p['stock']:5} | {p['stock_minimo']:6} | {p.get('vendidos_hoy',0):10}")
+    
 
-
-def ordenar_menu(productos: List[Dict]) -> None:
-    print("Ordenamientos disponibles:")
+def ordenar_menu(productos:List[Dict])->None:
+    print("Ordenamientos disponibles: ")
     print("1) Por precio (asc)")
     print("2) Por nombre (asc)")
     print("3) Por stock (desc)")
-    print("4) Ordenar por codigo (asc) - para busqueda binaria")
-    opt = input("Elige opcion: ").strip()
-    if opt == "1":
-        ordenar_burbuja(productos, "precio", reverse=False)
+    print("4) Ordenar por codigo (asc) - para búsqueda binaria")
+    opt=input("Elige opción: ")
+    if opt=="1":
+        ordenar_burbuja(productos,"precio", reverse=False)
         print("Ordenado por precio")
-    elif opt == "2":
-        ordenar_burbuja(productos, "nombre", reverse=False)
-        print("Ordenado por nombre")
-    elif opt == "3":
+    elif opt=="2":
+        ordenar_burbuja(productos,"nombre", reverse=False)
+        print("ordenado por nombre")
+    elif opt=="3":
         ordenar_burbuja(productos, "stock", reverse=True)
         print("Ordenado por stock")
-    elif opt == "4":
-        ordenar_burbuja(productos, "codigo", reverse=False)
+    elif opt=="4":
+        ordenar_burbuja(productos,"codigo",reverse=False)
         print("Ordenado por codigo")
     else:
-        print("Opcion invalida")
+        print("Opción inválida")
 
-
-def buscar_menu(productos: List[Dict]) -> None:
-    print("Busquedas:")
+def buscar_menu(productos:List[Dict])->None:
+    print("Búsquedas: ")
     print("1) Lineal por nombre")
     print("2) Binaria por codigo (requiere orden por codigo)")
     opt = input("Elige opcion: ").strip()
@@ -351,7 +334,7 @@ def buscar_menu(productos: List[Dict]) -> None:
         print("Opcion invalida.")
 
 
-def main_loop(productos: List[Dict], ventas_semana: List[List[float]]) -> None:
+def main_loop(productos:List[Dict], ventas_semana:List[List[float]])->None:
     while True:
         print("\n--- Kiosko Universitario UCB (menu) ---")
         print("1) Mostrar productos")
@@ -362,13 +345,13 @@ def main_loop(productos: List[Dict], ventas_semana: List[List[float]]) -> None:
         print("6) Registrar venta")
         print("7) Ordenamientos")
         print("8) Busquedas")
-        print("9) Reportes (Top3, Bajo stock, Resumen semanal)")
+        print("9) Reportes (Top3, Bajo stock, Ticket, Resumen semanal)")
         print("10) Exportar alertas (CSV)")
         print("11) Cargar snapshot binario (datos.bin)")
         print("12) Guardar ahora (CSV + BIN)")
         print("0) Salir")
-        opt = input("Elige opcion: ").strip()
-        if opt == "1":
+        opt=input("Elige opción: ")
+        if opt=="1":
             mostrar_productos(productos)
         elif opt == "2":
             anadir_producto(productos)
@@ -385,18 +368,18 @@ def main_loop(productos: List[Dict], ventas_semana: List[List[float]]) -> None:
         elif opt == "8":
             buscar_menu(productos)
         elif opt == "9":
-            print("Reportes disponibles:\n1) Top3  2) Bajo stock  3) Resumen semanal")
+            print("Reportes disponibles:\n1) Top3 2) Bajo stock 3) Ticket y total 4) Resumen semanal")
             r = input("Elige: ").strip()
             if r == "1":
                 reporte_top_3(productos)
             elif r == "2":
                 reportar_low_stock(productos)
-            elif r == "3":
+            elif r=="3":
                 reporte_semanal(ventas_semana)
             else:
                 print("Opcion invalida.")
         elif opt == "10":
-            exportar_alertas_csv(ALERTS_FILE, productos)
+            exportar_csv(ALERTS_FILE, productos)
             print(f"Exportadas alertas a {ALERTS_FILE}")
         elif opt == "11":
             try:
@@ -405,60 +388,52 @@ def main_loop(productos: List[Dict], ventas_semana: List[List[float]]) -> None:
                 productos.extend(p)
                 for i in range(7):
                     for j in range(3):
-                        ventas_semana[i][j] = v[i][j]
-                print("Binario cargado con exito")
+                        ventas_semana[i][j]=v[i][j]
+                print("Binario cargado con éxito")
             except Exception:
                 print("No se pudo cargar binario")
-        elif opt == "12":
-            guardar_csv(CSV_FILE, productos)
-            guardar_bin(BIN_FILE, productos, ventas_semana)
+        elif opt=="12":
+            guardar_csv(CSV_FILE,productos)
+            guardar_bin(BIN_FILE,productos,ventas_semana)
             print("Guardado CSV y BIN")
-        elif opt == "0":
-            print("Guardando antes de salir...")
-            guardar_csv(CSV_FILE, productos)
-            guardar_bin(BIN_FILE, productos, ventas_semana)
-            print("Guardado completo. Hasta luego.")
+        elif opt=="0":
+            print("Guardando antes de salir")
+            guardar_csv(CSV_FILE,productos)
+            guardar_bin(BIN_FILE,productos,ventas_semana)
+            print("guardado completo.")
             break
         else:
-            print("Opcion invalida. Intenta de nuevo.")
+            print("Error. Opción inválida.")
 
 
-def main() -> None:
+def main():
     if os.path.exists(BIN_FILE):
         try:
-            productos, ventas_semana = cargar_bin(BIN_FILE)
+            productos,ventas_semana=cargar_bin(BIN_FILE)
             print(f"Cargado binario: {len(productos)} productos.")
         except Exception:
-            print("Error al cargar binario, intentando CSV...")
+            print("Error al cargar binario, intentando csv")
             try:
-                productos, ventas_semana = cargar_csv(CSV_FILE)
-                print(f"Cargado CSV: {len(productos)} productos.")
+                productos,ventas_semana=cargar_csv(CSV_FILE)
+                print(f"Cargado csv: {len(productos)} productos.")
             except FileNotFoundError:
-                productos, ventas_semana = init_demo_products()
-                print("CSV no encontrado. Creando demo de productos.")
+                productos,ventas_semana=init_demo_productos()
+                print("CSV no encontrado. Creando demo de productos")
     else:
         if os.path.exists(CSV_FILE):
             try:
-                productos, ventas_semana = cargar_csv(CSV_FILE)
-                print(f"Cargado CSV: {len(productos)} productos.")
+                productos,ventas_semana=cargar_csv(CSV_FILE)
+                print(f"Cargado csv: {len(productos)} productos")
             except Exception:
-                productos, ventas_semana = init_demo_products()
-                print("Error leyendo CSV. Creando demo.")
+                productos,ventas_semana=init_demo_productos()
         else:
-            productos, ventas_semana = init_demo_products()
-            print("Archivos no encontrados. Creando demo de productos.")
+            productos,ventas_semana=init_demo_productos()
+            print("Archivos no encontrados. Creando demo de productos")
+            
+    main_loop(productos,ventas_semana)
 
-    try:
-        main_loop(productos, ventas_semana)
-    except KeyboardInterrupt:
-        # Guardado seguro en caso de Ctrl+C
-        print("\nInterrupcion por teclado. Guardando estado...")
-        try:
-            guardar_csv(CSV_FILE, productos)
-            guardar_bin(BIN_FILE, productos, ventas_semana)
-            print("Guardado completo. Adios.")
-        except Exception:
-            print("No se pudo guardar completamente.")
-        sys.exit(0)
+
+if __name__ == "__main__":
+    main()
 
 
