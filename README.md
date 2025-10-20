@@ -11,15 +11,15 @@ ALERTS_FILE="alertas.csv"
 
 def init_demo_productos()->Tuple[List[Dict],List[List[float]]]:
     demo=[
-        {"codigo":"A-001","nombre":"Regla","precio":6.5,"stock":20,"stock_mínimo":5,"vendidos_hoy":0},
-        {"codigo":"B-100","nombre":"Lápiz","precio":8.0,"stock":25,"stock_mínimo":6,"vendidos_hoy":0},
-        {"codigo":"C-200","nombre":"Borrador","precio":3.0,"stock":30,"stock_mínimo":3,"vendidos_hoy":0},
-        {"codigo":"D-300","nombre":"Cuaderno_anillado","precio":20,"stock":15,"stock_mínimo":2,"vendidos_hoy":0},
-        {"codigo":"F-400","nombre":"Tijera","precio":18.0,"stock":8,"stock_mínimo":2,"vendidos_hoy":0},
-        {"codigo":"G-500","nombre":"Marcador","precio":9.0,"stock":22,"stock_mínimo":5,"vendidos_hoy":0},
-        {"codigo":"H-600","nombre":"Resaltador","precio":5.0,"stock":40,"stock_mínimo":6,"vendidos_hoy":0},
-        {"codigo":"I-700","nombre":"Calculadora","precio":80.0,"stock":6,"stock_mínimo":2,"vendidos_hoy":0},
-        {"codigo":"J-800","nombre":"Archivador","precio":10.0,"stock":13,"stock_mínimo":3,"vendidos_hoy":0}
+        {"codigo":"A-001","nombre":"Regla","precio":6.5,"stock":20,"stock_minimo":5,"vendidos_hoy":0},
+        {"codigo":"B-100","nombre":"Lápiz","precio":8.0,"stock":25,"stock_minimo":6,"vendidos_hoy":0},
+        {"codigo":"C-200","nombre":"Borrador","precio":3.0,"stock":30,"stock_minimo":3,"vendidos_hoy":0},
+        {"codigo":"D-300","nombre":"Cuaderno_anillado","precio":20,"stock":15,"stock_minimo":2,"vendidos_hoy":0},
+        {"codigo":"F-400","nombre":"Tijera","precio":18.0,"stock":8,"stock_minimo":2,"vendidos_hoy":0},
+        {"codigo":"G-500","nombre":"Marcador","precio":9.0,"stock":22,"stock_minimo":5,"vendidos_hoy":0},
+        {"codigo":"H-600","nombre":"Resaltador","precio":5.0,"stock":40,"stock_minimo":6,"vendidos_hoy":0},
+        {"codigo":"I-700","nombre":"Calculadora","precio":80.0,"stock":6,"stock_minimo":2,"vendidos_hoy":0},
+        {"codigo":"J-800","nombre":"Archivador","precio":10.0,"stock":13,"stock_minimo":3,"vendidos_hoy":0}
     ]
     ventas_semana=[[0.0 for i in range(3)] for i in range(7)]
     return demo, ventas_semana
@@ -37,7 +37,7 @@ def cargar_csv(path:str)->Tuple[List[Dict],List[List[float]]]:
                         "nombre":fila["nombre"].strip(),
                         "precio":float(fila.get("precio",0)),
                         "stock":int(float(fila.get("stock",0))),
-                        "stock_mínimo":int(float(fila.get("stock_mínimo",0))),
+                        "stock_minimo":int(float(fila.get("stock_minimo",0))),
                         "vendidos_hoy":int(float(fila.get("vendidos_hoy",0))) if fila.get("vendidos_hoy") not in (None,"") else 0,
                     }
                     productos.append(prod)
@@ -54,7 +54,7 @@ def cargar_csv(path:str)->Tuple[List[Dict],List[List[float]]]:
 
 def guardar_csv(path:str,productos:List[Dict])->None:
     with open(path,"w",newline="",encoding="utf-8") as f:
-        fieldnames=["codigo","nombre","precio","stock","stock_mínimo","vendidos_hoy"]
+        fieldnames=["codigo","nombre","precio","stock","stock_minimo","vendidos_hoy"]
         w=csv.DictWriter(f,fieldnames=fieldnames)
         w.writeheader()
         for p in productos:
@@ -63,7 +63,7 @@ def guardar_csv(path:str,productos:List[Dict])->None:
                 "nombre":p["nombre"],
                 "precio":f"{p["precio"]:.2f}",
                 "stock":p["stock"],
-                "stock_mínimo":p["stock_mínimo"],
+                "stock_minimo":p["stock_minimo"],
                 "vendidos_hoy":p.get("vendidos_hoy",0),
             })
 
@@ -88,7 +88,7 @@ def cargar_bin(path: str) -> Tuple[List[Dict], List[List[float]]]:
 
 
 def exportar_csv(path:str, productos:List[Dict])->None:
-    bajo=[p for p in productos if p ["stock"]<=p["stock_mínimo"]]
+    bajo=[p for p in productos if p ["stock"]<=p["stock_minimo"]]
     with open(path,"w",newline="",encoding="utf-8") as f:
         fieldnames = ["codigo", "nombre", "stock", "stock_minimo"]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
